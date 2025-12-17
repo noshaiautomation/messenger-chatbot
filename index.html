@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Start Tax Relief - Anna</title>
+    <style>
+        /* CSS STYLES - Messenger Look & Feel */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 400px; /* Mobile width simulation */
+            height: 90vh;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .chat-header {
+            background-color: #0084ff; /* Messenger Blue */
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #0084ff;
+        }
+
+        .header-info h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .header-info p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Chat History Area */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Message Bubbles */
+        .message {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Bot Message (Left) */
+        .message.bot {
+            align-self: flex-start;
+            background-color: #e4e6eb;
+            color: black;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* User Message (Right) */
+        .message.user {
+            align-self: flex-end;
+            background-color: #0084ff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Typing Indicator */
+        .typing {
+            font-size: 12px;
+            color: #888;
+            margin-left: 10px;
+            display: none;
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            background-color: #f9f9f9;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        button {
+            background-color: #0084ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #006bce;
+        }
+
+        /* Links in messages */
+        .message a {
+            color: inherit;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+        <div class="avatar">A</div>
+        <div class="header-info">
+            <h2>Anna (Fresh Start)</h2>
+            <p>Tax Relief Expert • Online</p>
+        </div>
+    </div>
+
+    <!-- Message Area -->
+    <div class="chat-messages" id="chatMessages">
+        <!-- Initial Greeting (Per your prompt rules) -->
+        <div class="message bot">
+            Hi there! I saw that you just did the first step toward financial freedom. It is really easier than what you think. Do you have any questions at this time?
+        </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="typing" id="typingIndicator">Anna is typing...</div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleEnter(event)">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // YOUR N8N WEBHOOK URL
+    const WEBHOOK_URL = "https://n8n.srv846726.hstgr.cloud/webhook/38dd320e-148f-4ed4-bc7a-bc6af779f167";
+
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // Handle Enter Key
+    function handleEnter(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    // Auto-scroll to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Add message to UI
+    function appendMessage(text, sender) {
+        const div = document.createElement('div');
+        div.classList.add('message', sender);
+        
+        // Convert URLs to clickable links automatically
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const htmlText = text.replace(urlRegex, function(url) {
+            return '<a href="' + url + '" target="_blank">' + url + '</a>';
+        });
+
+        div.innerHTML = htmlText;
+        chatMessages.appendChild(div);
+        scrollToBottom();
+    }
+
+    // Send Message Logic
+    async function sendMessage() {
+        const messageText = userInput.value.trim();
+        if (!messageText) return;
+
+        // 1. Add User Message to Chat
+        appendMessage(messageText, 'user');
+        userInput.value = '';
+
+        // 2. Show Typing Indicator
+        typingIndicator.style.display = 'block';
+
+        try {
+            // 3. Send to n8n Webhook
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                // We send the data as JSON with the key "message"
+                body: JSON.stringify({ 
+                    message: messageText,
+                    sessionId: "session-" + Math.random().toString(36).substr(2, 9) // Random session ID
+                })
+            });
+
+            // 4. Handle Response
+            typingIndicator.style.display = 'none';
+
+            if (response.ok) {
+                // Determine if n8n returns JSON or Text
+                const contentType = response.headers.get("content-type");
+                let botResponse = "";
+
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await response.json();
+                    // CHANGE 'output' BELOW TO MATCH YOUR N8N JSON KEY (e.g., data.text, data.response)
+                    botResponse = data.output || data.message || data.text || JSON.stringify(data);
+                } else {
+                    botResponse = await response.text();
+                }
+
+                appendMessage(botResponse, 'bot');
+            } else {
+                appendMessage("Error: Could not connect to Anna.", 'bot');
+                console.error("Webhook Error:", response.statusText);
+            }
+
+        } catch (error) {
+            typingIndicator.style.display = 'none';
+            appendMessage("Error: Network issue or CORS policy.", 'bot');
+            console.error("Fetch Error:", error);
+        }
+    }
+</script>
+
+</body>
+</html>
