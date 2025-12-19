@@ -33,7 +33,7 @@ button:hover { background-color: #006bce; }
     <div class="chat-header">
         <div class="avatar">A</div>
         <div class="header-info">
-            <h2>Anna (Fresh Start)</h2>
+            <h2>Anna</h2>
             <p>Tax Relief Expert • Online</p>
         </div>
     </div>
@@ -79,8 +79,6 @@ const RE_ENGAGEMENT_QUESTIONS = [
     "What does success look like to you in resolving this tax issue?\nCall us at (888) 987-5092 or set up an appointment here: http://bit.ly/stoptax",
     "Ideally, how would you like your relationship with the IRS to look a year from now?\nCall us at (888) 987-5092 or set up an appointment here: http://bit.ly/stoptax",
     "If we were able to fully resolve this for you, how would that peace of mind or freed-up cash affect your life?\nCall us at (888) 987-5092 or set up an appointment here: http://bit.ly/stoptax",
-    "Based on what we’ve discussed, what are your biggest concerns about moving forward with a tax resolution firm?\nCall us at (888) 987-5092 or set up an appointment here: http://bit.ly/stoptax",
-    "What is your timeline for getting this resolved?\nCall us at (888) 987-5092 or set up an appointment here: http://bit.ly/stoptax",
     "What information do you need to feel confident about taking the next step with us?\nCall us at (888) 987-5092 or set up an appointment here: http://bit.ly/stoptax"
 ];
 
@@ -91,10 +89,15 @@ function appendMessage(text, sender) {
     const div = document.createElement("div"); 
     div.className = `message ${sender}`; 
 
-    // Convert newlines to <br> and detect URLs
-    const htmlText = text
-        .replace(/\n/g, "<br>") // newlines
-        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>'); // make links clickable
+    // Split text into main question and CTA
+    const parts = text.split(/(Call us at.*|set up an appointment.*|http[^\s]+)/i);
+    let htmlText = parts[0] || "";
+
+    if (parts[1]) {
+        htmlText += "<br><br>"; // double line break for one empty line
+        // Make URLs clickable
+        htmlText += parts[1].replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+    }
 
     div.innerHTML = htmlText;
     chatMessages.appendChild(div); 
@@ -108,7 +111,7 @@ function startInactivityTimer() {
 
     if (sentQuestions.length >= RE_ENGAGEMENT_QUESTIONS.length) return;
 
-    inactivityTimer = setTimeout(sendReEngagementMessage, 5 * 60 * 1000); // 5 minutes
+    inactivityTimer = setTimeout(sendReEngagementMessage, 2 * 60 * 1000); // 5 minutes
 }
 
 function sendReEngagementMessage() {
